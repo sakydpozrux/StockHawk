@@ -12,6 +12,7 @@ import android.support.annotation.Nullable;
 
 
 public class StockProvider extends ContentProvider {
+    public static final String ACTION_DATA_UPDATED = "com.udacity.stockhawk.ACTION_DATA_UPDATED";
 
     private static final int QUOTE = 100;
     private static final int QUOTE_FOR_SYMBOL = 101;
