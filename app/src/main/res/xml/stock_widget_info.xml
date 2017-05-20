@@ -3,9 +3,9 @@
                     android:minWidth="250dp"
                     android:minHeight="110dp"
                     android:updatePeriodMillis="0"
+                    android:previewImage="@drawable/ic_widget_preview"
                     android:initialLayout="@layout/stock_widget_layout"
                     android:resizeMode="horizontal|vertical"
                     android:widgetCategory="home_screen|keyguard">
 </appwidget-provider>
 
-    <!--android:previewImage="@drawable/preview"-->
