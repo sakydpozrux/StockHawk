@@ -33,5 +33,6 @@
     <string name="toast_no_connectivity">Will refresh when network available.</string>
 
     <string name="error_no_data">No stocks added.</string>
+    <string name="error_stock_not_found">Could not find the selected stock data.</string>
 
 </resources>
