@@ -41,7 +41,7 @@ class StockAdapter extends RecyclerView.Adapter<StockAdapter.StockViewHolder> {
     }
 
     @Override
-    public StockViewHolder onCreateViewHolder(ViewGroup parent, int viewType) {
+    public StockViewHolder onCreateViewHolder(final ViewGroup parent, int viewType) {
 
         View item = LayoutInflater.from(context).inflate(R.layout.list_item_quote, parent, false);
 
@@ -77,8 +77,6 @@ class StockAdapter extends RecyclerView.Adapter<StockAdapter.StockViewHolder> {
         } else {
             holder.change.setText(percentage);
         }
-
-
     }
 
     @Override
