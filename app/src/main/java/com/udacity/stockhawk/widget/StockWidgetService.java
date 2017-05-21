@@ -79,7 +79,7 @@ public class StockWidgetService extends RemoteViewsService {
 
                 views.setTextViewText(R.id.symbol, symbol);
                 views.setTextViewText(R.id.price, StockFormatUtils.getDollarFormat(price, true));
-                views.setTextViewText(R.id.change, StockFormatUtils.getPercentageFormat(percentageChange));
+                views.setTextViewText(R.id.change, StockFormatUtils.getPercentageFormat(percentageChange / 100));
 
 
 
