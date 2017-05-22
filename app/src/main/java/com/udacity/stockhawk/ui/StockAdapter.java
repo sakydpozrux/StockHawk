@@ -7,6 +7,7 @@ import android.support.v7.widget.RecyclerView;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
+import android.widget.LinearLayout;
 import android.widget.TextView;
 
 import com.udacity.stockhawk.R;
@@ -50,32 +51,40 @@ class StockAdapter extends RecyclerView.Adapter<StockAdapter.StockViewHolder> {
 
     @Override
     public void onBindViewHolder(StockViewHolder holder, int position) {
-
         cursor.moveToPosition(position);
 
+        final String symbol = cursor.getString(Contract.Quote.POSITION_SYMBOL);
+        holder.symbol.setText(symbol);
 
-        holder.symbol.setText(cursor.getString(Contract.Quote.POSITION_SYMBOL));
-        holder.price.setText(StockFormatUtils.getDollarFormat(
-                cursor.getFloat(Contract.Quote.POSITION_PRICE), false));
+        final float price = cursor.getFloat(Contract.Quote.POSITION_PRICE);
+        holder.price.setText(StockFormatUtils.getDollarFormat(price, false));
 
 
         float rawAbsoluteChange = cursor.getFloat(Contract.Quote.POSITION_ABSOLUTE_CHANGE);
         float percentageChange = cursor.getFloat(Contract.Quote.POSITION_PERCENTAGE_CHANGE);
 
-        if (rawAbsoluteChange > 0) {
-            holder.change.setBackgroundResource(R.drawable.percent_change_pill_green);
+        if (price == 0.0 && rawAbsoluteChange == 0.0 && percentageChange == 0.0) {
+            holder.textError.setVisibility(View.VISIBLE);
+            holder.layoutValues.setVisibility(View.INVISIBLE);
         } else {
-            holder.change.setBackgroundResource(R.drawable.percent_change_pill_red);
-        }
+            holder.textError.setVisibility(View.INVISIBLE);
+            holder.layoutValues.setVisibility(View.VISIBLE);
 
-        String change = StockFormatUtils.getDollarFormat(rawAbsoluteChange, true);
-        String percentage = StockFormatUtils.getPercentageFormat(percentageChange / 100);
+            if (rawAbsoluteChange > 0) {
+                holder.change.setBackgroundResource(R.drawable.percent_change_pill_green);
+            } else {
+                holder.change.setBackgroundResource(R.drawable.percent_change_pill_red);
+            }
 
-        if (PrefUtils.getDisplayMode(context)
-                .equals(context.getString(R.string.pref_display_mode_absolute_key))) {
-            holder.change.setText(change);
-        } else {
-            holder.change.setText(percentage);
+            String change = StockFormatUtils.getDollarFormat(rawAbsoluteChange, true);
+            String percentage = StockFormatUtils.getPercentageFormat(percentageChange / 100);
+
+            if (PrefUtils.getDisplayMode(context)
+                    .equals(context.getString(R.string.pref_display_mode_absolute_key))) {
+                holder.change.setText(change);
+            } else {
+                holder.change.setText(percentage);
+            }
         }
     }
 
@@ -104,6 +113,12 @@ class StockAdapter extends RecyclerView.Adapter<StockAdapter.StockViewHolder> {
         @BindView(R.id.change)
         TextView change;
 
+        @BindView(R.id.text_error)
+        TextView textError;
+
+        @BindView(R.id.layout_values)
+        LinearLayout layoutValues;
+
         StockViewHolder(View itemView) {
             super(itemView);
             ButterKnife.bind(this, itemView);
@@ -112,11 +127,13 @@ class StockAdapter extends RecyclerView.Adapter<StockAdapter.StockViewHolder> {
 
         @Override
         public void onClick(View v) {
+            if (textError.getVisibility() == View.VISIBLE)
+                return;
+
             int adapterPosition = getAdapterPosition();
             cursor.moveToPosition(adapterPosition);
             int symbolColumn = cursor.getColumnIndex(Contract.Quote.COLUMN_SYMBOL);
             clickHandler.onClick(cursor.getString(symbolColumn));
-
         }
 
 

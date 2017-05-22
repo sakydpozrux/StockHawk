@@ -3,6 +3,7 @@ package com.udacity.stockhawk.widget;
 import android.content.Intent;
 import android.database.Cursor;
 import android.os.Binder;
+import android.view.View;
 import android.widget.AdapterView;
 import android.widget.RemoteViews;
 import android.widget.RemoteViewsService;
@@ -78,17 +79,24 @@ public class StockWidgetService extends RemoteViewsService {
                 RemoteViews views = new RemoteViews(getPackageName(), R.layout.list_item_quote);
 
                 views.setTextViewText(R.id.symbol, symbol);
-                views.setTextViewText(R.id.price, StockFormatUtils.getDollarFormat(price, true));
-                views.setTextViewText(R.id.change, StockFormatUtils.getPercentageFormat(percentageChange / 100));
 
+                if (price == 0.0 && percentageChange == 0.0) {
+                    views.setViewVisibility(R.id.text_error, View.VISIBLE);
+                    views.setViewVisibility(R.id.layout_values, View.INVISIBLE);
+                } else {
+                    views.setViewVisibility(R.id.text_error, View.INVISIBLE);
+                    views.setViewVisibility(R.id.layout_values, View.VISIBLE);
 
+                    views.setTextViewText(R.id.price, StockFormatUtils.getDollarFormat(price, true));
+                    views.setTextViewText(R.id.change, StockFormatUtils.getPercentageFormat(percentageChange / 100));
 
-                final int backgroundResource =
-                        (percentageChange >= 0.0)
-                        ? R.drawable.percent_change_pill_green
-                        : R.drawable.percent_change_pill_red;
+                    final int backgroundResource =
+                            (percentageChange >= 0.0)
+                                    ? R.drawable.percent_change_pill_green
+                                    : R.drawable.percent_change_pill_red;
 
-                views.setInt(R.id.change, "setBackgroundResource", backgroundResource);
+                    views.setInt(R.id.change, "setBackgroundResource", backgroundResource);
+                }
 
                 return views;
             }

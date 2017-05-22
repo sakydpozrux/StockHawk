@@ -14,6 +14,7 @@ import com.udacity.stockhawk.data.Contract;
 import com.udacity.stockhawk.data.PrefUtils;
 
 import java.io.IOException;
+import java.math.BigDecimal;
 import java.util.ArrayList;
 import java.util.Calendar;
 import java.util.HashSet;
@@ -74,38 +75,45 @@ public final class QuoteSyncJob {
 
                 Stock stock = quotes.get(symbol);
                 StockQuote quote = stock.getQuote();
-
-                float price = quote.getPrice().floatValue();
-                float change = quote.getChange().floatValue();
-                float percentChange = quote.getChangeInPercent().floatValue();
-
-                // WARNING! Don't request historical data for a stock that doesn't exist!
-                // The request will hang forever X_x
-                // List<HistoricalQuote> history = stock.getHistory(from, to, Interval.WEEKLY);
-
-                // Note for reviewer:
-                // Due to problems with Yahoo Finance API
-                // I commented out the line above and I'm using MockUtils class instead.
-                // This should be enough to develop and review the app while the API is down:
-                List<HistoricalQuote> history = MockUtils.getHistory();
-
-                StringBuilder historyBuilder = new StringBuilder();
-
-                for (HistoricalQuote it : history) {
-                    historyBuilder.append(it.getDate().getTimeInMillis());
-                    historyBuilder.append(", ");
-                    historyBuilder.append(it.getClose());
-                    historyBuilder.append("\n");
-                }
-
                 ContentValues quoteCV = new ContentValues();
-                quoteCV.put(Contract.Quote.COLUMN_SYMBOL, symbol);
-                quoteCV.put(Contract.Quote.COLUMN_PRICE, price);
-                quoteCV.put(Contract.Quote.COLUMN_PERCENTAGE_CHANGE, percentChange);
-                quoteCV.put(Contract.Quote.COLUMN_ABSOLUTE_CHANGE, change);
 
+                final BigDecimal quotePrice = quote.getPrice();
+                final BigDecimal quoteChange = quote.getChange();
+                final BigDecimal quoteChangeInPercent = quote.getChangeInPercent();
 
-                quoteCV.put(Contract.Quote.COLUMN_HISTORY, historyBuilder.toString());
+                if (quotePrice != null && quoteChange != null && quoteChangeInPercent != null) {
+                    float price = quotePrice.floatValue();
+                    float change = quoteChange.floatValue();
+                    float percentChange = quoteChangeInPercent.floatValue();
+
+                    // WARNING! Don't request historical data for a stock that doesn't exist!
+                    // The request will hang forever X_x
+                    // List<HistoricalQuote> history = stock.getHistory(from, to, Interval.WEEKLY);
+
+                    // Note for reviewer:
+                    // Due to problems with Yahoo Finance API
+                    // I commented out the line above and I'm using MockUtils class instead.
+                    // This should be enough to develop and review the app while the API is down:
+                    List<HistoricalQuote> history = MockUtils.getHistory();
+
+                    StringBuilder historyBuilder = new StringBuilder();
+
+                    for (HistoricalQuote it : history) {
+                        historyBuilder.append(it.getDate().getTimeInMillis());
+                        historyBuilder.append(", ");
+                        historyBuilder.append(it.getClose());
+                        historyBuilder.append("\n");
+                    }
+
+                    quoteCV.put(Contract.Quote.COLUMN_SYMBOL, symbol);
+                    quoteCV.put(Contract.Quote.COLUMN_PRICE, price);
+                    quoteCV.put(Contract.Quote.COLUMN_PERCENTAGE_CHANGE, percentChange);
+                    quoteCV.put(Contract.Quote.COLUMN_ABSOLUTE_CHANGE, change);
+
+                    quoteCV.put(Contract.Quote.COLUMN_HISTORY, historyBuilder.toString());
+                } else {
+                    quoteCV.put(Contract.Quote.COLUMN_SYMBOL, symbol);
+                }
 
                 quoteCVs.add(quoteCV);
 
@@ -118,7 +126,6 @@ public final class QuoteSyncJob {
 
             Intent dataUpdatedIntent = new Intent(ACTION_DATA_UPDATED);
             context.sendBroadcast(dataUpdatedIntent);
-
         } catch (IOException exception) {
             Timber.e(exception, "Error fetching stock quotes");
         }
