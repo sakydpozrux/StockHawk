@@ -34,4 +34,9 @@
     <string name="error_no_data">No stocks added.</string>
     <string name="error_stock_not_found">Could not find the selected stock data.</string>
     <string name="error_could_not_find">Could not find</string>
+
+    <!-- Content descriptions for accessibility -->
+    <string name="cd_add_new_symbol">Add new symbol</string>
+    <string name="cd_pull_down_refresh">Pull down to refresh stocks</string>
+    <string name="cd_history_graph">Graph with historical data of the selected stock</string>
 </resources>
